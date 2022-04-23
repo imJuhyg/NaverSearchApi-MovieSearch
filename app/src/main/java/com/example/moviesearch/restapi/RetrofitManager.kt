@@ -1,4 +1,4 @@
-package com.example.moviesearch.searchapi
+package com.example.moviesearch.restapi
 
 import android.util.Log
 import com.google.gson.JsonElement

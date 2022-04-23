@@ -1,4 +1,4 @@
-package com.example.moviesearch.searchapi
+package com.example.moviesearch.restapi
 
 import com.google.gson.annotations.SerializedName
 import java.util.*

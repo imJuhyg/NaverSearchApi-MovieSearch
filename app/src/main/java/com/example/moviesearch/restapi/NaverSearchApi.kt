@@ -1,4 +1,4 @@
-package com.example.moviesearch.searchapi
+package com.example.moviesearch.restapi
 
 import com.google.gson.JsonElement
 import retrofit2.Call

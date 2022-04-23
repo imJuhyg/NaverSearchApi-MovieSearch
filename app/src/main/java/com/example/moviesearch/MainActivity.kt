@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviesearch.adapter.MovieRecyclerViewAdapter
 import com.example.moviesearch.databinding.ActivityMainBinding
-import com.example.moviesearch.searchapi.NaverOpenApiManager
+import com.example.moviesearch.restapi.NaverOpenApiManager
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding

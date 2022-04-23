@@ -2,7 +2,7 @@ package com.example.moviesearch
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.moviesearch.searchapi.RetrofitManager
+import com.example.moviesearch.restapi.RetrofitManager
 
 class SearchHistoryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
