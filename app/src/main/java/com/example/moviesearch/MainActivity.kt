@@ -42,17 +42,17 @@ class MainActivity : AppCompatActivity() {
             if(binding.editTextSearch.text.isEmpty()) {
                 Toast.makeText(this, "최소 한 자 이상의 검색어를 입력해 주세요.", Toast.LENGTH_SHORT).show()
 
-            } else {
+            } else { // EditText 에 글자가 입력된 경우
                 val movieTitle = binding.editTextSearch.text.toString()
 
-                // TODO 검색 이력 저장
+                // Room DB - 검색 이력 저장
                 val searchHistoryDto = SearchHistory(
                     time = Date(System.currentTimeMillis()),
                     searchName = movieTitle
                 )
-                localDatabaseViewModel.insertHistory(searchHistoryDto)
-                // ----
+                localDatabaseViewModel.insertHistory(searchHistoryDto) // INSERT
 
+                // REST API - 검색 결과 호출
                 naverOpenApiManager.getMovieInfo(partTitle = movieTitle,
                     success = { list, nextPage ->
                         if(list.isEmpty()) {
@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                     }, failure = {
+                        // TODO Error handling
                         it.printStackTrace()
                     }
                 )
@@ -78,22 +79,20 @@ class MainActivity : AppCompatActivity() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                // Cast LinearLayoutManager
                 val linearLayoutManager: LinearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
-                // 마지막 아이템의 position 반환
-                val lastItemCount = linearLayoutManager.findLastCompletelyVisibleItemPosition()
-                // 전체 아이템 개수
-                val totalItemCount = linearLayoutManager.itemCount
+                val lastItemCount = linearLayoutManager.findLastCompletelyVisibleItemPosition() // 마지막 아이템의 position 반환
+                val totalItemCount = linearLayoutManager.itemCount // 전체 아이템 개수
 
                 // 최소 한 개 이상의 아이템이 있고, 마지막 아이템을 보고 있는 경우
                 if(totalItemCount != 0 && lastItemCount == totalItemCount-1) {
-                    if(nextPage > 0) { // 다음 검색이 가능한 경우 Api Call
+                    if(nextPage > 0) { // 다음 검색이 가능한 경우 Api Call(더 이상 호출할 결과가 없을 경우 nextPage == -1)
                         naverOpenApiManager.getMovieInfo(startIndex = nextPage, partTitle = searchedMovieTitle,
                         success = { list, nextPage ->
                             this@MainActivity.nextPage = nextPage
                             movieRecyclerViewAdapter.addItem(list)
 
                         }, failure = {
+                            // TODO Error Handling
                             it.printStackTrace()
                         })
                     } else {
@@ -106,20 +105,24 @@ class MainActivity : AppCompatActivity() {
         // RecyclerView Item click event
         movieRecyclerViewAdapter.setOnItemClickListener(object: MovieRecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                // 영화 검색 결과 인텐트 표시
+                // 영화 정보 인텐트
                 val movieInfoLink = movieRecyclerViewAdapter.getItem(position).movieLink
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(movieInfoLink))
                 startActivity(intent)
             }
         })
 
-        // SearchHistory Observer
+        // 검색 이력 Observer
         localDatabaseViewModel.searchNameLiveData.observe(this, {
             it.forEach { Log.d("observe", it) }
+            // TODO
+            // 1. Intent 로 검색 이력 넘기고
+            // 2. NewActivity 에서 검색 이력 아이템 클릭하면
+            // 3. startActivityForResult 로 검색 이력 결과 받아서 EditText 에 넣고 RecyclerView 에 표시
 
         })
         binding.buttonSearchHistory.setOnClickListener { // '최근검색' click event
-            localDatabaseViewModel.getSearchHistory(limit = 10)
+            localDatabaseViewModel.getSearchHistory(limit = 10) // 시간 상위 10개 까지 검색 이력 호출
         }
     }
 }
