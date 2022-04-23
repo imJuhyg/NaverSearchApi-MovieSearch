@@ -33,8 +33,13 @@ fun getSearchHistory(limit: Int): List<SearchHistory>
 <b>추가 고려 사항</b>  
 * 동일한 검색 기록이 있을 때 가장 최근에 검색된 검색 기록 한개만 가져옵니다.
 ```kotlin
-/* 검색명 기준으로 그룹화 후 time 기준 내림차순 정렬 / limit으로 검색 결과 개수 제한 */
-@Query("SELECT * FROM SearchHistory GROUP BY searchName ORDER BY time DESC LIMIT :limit")
+// (1)-1 동일한 'searchName'이 있을 경우 MAX(time)인 이력만 조건식 통과
+// (1)-2 동일한 'searchName'이 없으면 자기 자신이 MAX(time)이므로 조건식 통과
+// (2) 최종 정렬 기준: time 내림차순
+@Query("SELECT searchName FROM SearchHistory " +
+       "WHERE time IN (SELECT MAX(time) FROM SearchHistory GROUP BY searchName) " + // (1)
+       "ORDER BY time DESC " + // (2)
+       "LIMIT :limit")
 fun getSearchHistory(limit: Int): List<SearchHistory>
 
 /* 로그 */
