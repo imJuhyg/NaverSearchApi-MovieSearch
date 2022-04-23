@@ -1,7 +1,6 @@
 package com.example.moviesearch.restapi
 
 import com.google.gson.annotations.SerializedName
-import java.util.*
 
 data class MovieItems(val total: Int, val start: Int, val display: Int, val items: List<MovieDTO>)
 

@@ -5,18 +5,26 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviesearch.adapter.MovieRecyclerViewAdapter
 import com.example.moviesearch.databinding.ActivityMainBinding
+import com.example.moviesearch.repository.LocalDatabaseRepository
 import com.example.moviesearch.restapi.NaverOpenApiManager
+import com.example.moviesearch.room.dao.SearchHistoryDao
+import com.example.moviesearch.room.entities.SearchHistory
+import com.example.moviesearch.viewmodel.LocalDatabaseViewModel
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val naverOpenApiManager by lazy { NaverOpenApiManager() }
     private val movieRecyclerViewAdapter by lazy { MovieRecyclerViewAdapter(this) }
+    private val localDatabaseViewModel by lazy {
+        ViewModelProvider(this).get(LocalDatabaseViewModel::class.java)
+    }
     private var searchedMovieTitle: String? = null
     private var nextPage: Int = -1
 
@@ -36,6 +44,15 @@ class MainActivity : AppCompatActivity() {
 
             } else {
                 val movieTitle = binding.editTextSearch.text.toString()
+
+                // TODO 검색 이력 저장
+                val searchHistoryDto = SearchHistory(
+                    time = Date(System.currentTimeMillis()),
+                    searchName = movieTitle
+                )
+                localDatabaseViewModel.insertHistory(searchHistoryDto)
+                // ----
+
                 naverOpenApiManager.getMovieInfo(partTitle = movieTitle,
                     success = { list, nextPage ->
                         if(list.isEmpty()) {
@@ -95,5 +112,14 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         })
+
+        // SearchHistory Observer
+        localDatabaseViewModel.searchNameLiveData.observe(this, {
+            it.forEach { Log.d("observe", it) }
+
+        })
+        binding.buttonSearchHistory.setOnClickListener { // '최근검색' click event
+            localDatabaseViewModel.getSearchHistory(limit = 10)
+        }
     }
 }
