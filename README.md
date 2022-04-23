@@ -20,6 +20,16 @@ replace 메소드를 통해 태그를 삭제한 값으로 이름을 다시 저�
 ```
 검색 API의 결과에 영화 Link Url은 존재하지 않을 수 있으므로 Glide.error()를 통해 대체 이미지를 표시합니다.
 ```
+---
+### Room - 최근 검색 이력 저장을 위한 로컬 데이터베이스
+### 테이블 설계  
+<b>SearchHistory</b>
+|Field|Type|Null|Pri|Ex|
+|---|---|---|---|---|
+|id|Int|NotNull|Pri|순번(auto increment)|
+|time|DateTime|NotNull||시간 기준 내림차순 정렬을 위한 필드|
+|searchName|String|NotNull||검색어|
+
 
 ## API Version Test
 * <b>api 23 - 정상 작동</b>
