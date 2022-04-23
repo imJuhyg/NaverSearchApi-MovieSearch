@@ -7,7 +7,7 @@ import com.example.moviesearch.room.entities.SearchHistory
 
 @Dao
 interface SearchHistoryDao {
-    @Query("SELECT searchName FROM SearchHistory GROUP BY searchName ORDER BY time DESC LIMIT :limit")
+    @Query("SELECT searchName FROM SearchHistory WHERE time IN (SELECT MAX(time) FROM SearchHistory GROUP BY searchName) ORDER BY time DESC LIMIT :limit")
     fun getSearchHistory(limit: Int): List<String>
 
     @Insert
