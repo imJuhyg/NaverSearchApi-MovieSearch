@@ -23,7 +23,7 @@ class NaverOpenApiManager : RetrofitManager(NAVER_OPEN_API_URL) {
             "movie.json",
             partTitle,
             startIndex
-        )
+        ) // url ex) https://openapi.naver.com/v1/movie.json?query={parTitle}&startIndex={startIndex}
 
         call.enqueue(object: Callback<MovieItems> {
             override fun onResponse(call: Call<MovieItems>, response: Response<MovieItems>) {

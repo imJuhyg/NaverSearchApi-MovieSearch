@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerViewMovie.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewMovie.adapter = movieRecyclerViewAdapter
 
-        binding.buttonSearch.setOnClickListener {
+        binding.buttonSearch.setOnClickListener { // '검색' 버튼을 클릭했을 때
             movieRecyclerViewAdapter.clearItem()
             // TODO editText == ""일 때 검색어를 입력해주세요 Toast
             val movieTitle = binding.editTextSearch.text.toString()
@@ -45,5 +45,8 @@ class MainActivity : AppCompatActivity() {
                 }
             )
         }
+
+        // 리사이클러뷰 스크롤을 마지막까지 내렸을 때 검색 결과 10개 추가
+
     }
 }
