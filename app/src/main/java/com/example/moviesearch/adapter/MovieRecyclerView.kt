@@ -37,8 +37,8 @@ class MovieRecyclerView(private val context: Context) : RecyclerView.Adapter<Mov
             // Glide
             Glide.with(context)
                 .load(movieItem.imageLink)
+                .error(R.drawable.image_not_found)
                 .into(movieImageView)
-            // TODO image url error handling
         }
     }
 
