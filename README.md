@@ -18,7 +18,7 @@ replace 메소드를 통해 태그를 삭제한 값으로 이름을 다시 저�
 ### Glide - 영화 썸네일 이미지 로딩 및 리사이클러뷰 탑재
 <b>추가 고려 사항</b>
 ```
-검색 API의 결과에 영화 Link Url은 존재하지 않을 수 있으므로 Glide error handling을 통해 대체 이미지를 표시합니다.
+검색 API의 결과에 영화 Link Url은 존재하지 않을 수 있으므로 Glide.error()를 통해 대체 이미지를 표시합니다.
 ```
 
 ## API Version Test
@@ -30,4 +30,4 @@ replace 메소드를 통해 태그를 삭제한 값으로 이름을 다시 저�
 * <b>api 28 - 정상 작동</b>
 * <b>api 29 - 정상 작동</b>
 * <b>api 30 - 정상 작동</b>
-* <b>api 31 - GlideException: Failed to load resource</b>
+* <b>api 31 - 정상 작동</b>
