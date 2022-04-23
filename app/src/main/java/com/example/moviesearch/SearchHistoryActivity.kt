@@ -35,6 +35,7 @@ class SearchHistoryActivity : AppCompatActivity() {
 
         // 검색 이력 Observer
         localDatabaseViewModel.searchNameLiveData.observe(this, {
+            it.forEach { Log.d("debug", it) }
             if(it.isEmpty()) binding.noSearchHistoryTextView.visibility = View.VISIBLE
             else movieTitleRecyclerViewAdapter.addItem(it) // Add item
         })

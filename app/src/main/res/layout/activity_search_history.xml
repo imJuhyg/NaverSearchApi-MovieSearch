@@ -17,17 +17,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"/>
 
-    <TextView
-        android:id="@+id/no_search_history_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:text="@string/no_search_history"
-        android:textSize="18sp"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/activity_title"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="gone"/>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/movie_title_recycler_view"
         android:layout_width="match_parent"
@@ -38,4 +27,14 @@
         app:layout_constraintTop_toBottomOf="@id/activity_title"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <TextView
+        android:id="@+id/no_search_history_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:text="@string/no_search_history"
+        android:textSize="18sp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/activity_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

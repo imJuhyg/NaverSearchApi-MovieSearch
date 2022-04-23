@@ -118,8 +118,16 @@ class MainActivity : AppCompatActivity() {
         activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if(result.resultCode == RESULT_OK) { // 최근 검색 이력을 클릭했을 때만 실행
                 movieRecyclerViewAdapter.clearItem()
-                val selectedSearchName = result.data?.getStringExtra("SEARCH_NAME")
-                selectedSearchName?.let { binding.editTextSearch.setText(it) }
+                val selectedSearchName = result.data?.getStringExtra("SEARCH_NAME")!!
+                binding.editTextSearch.setText(selectedSearchName)
+
+                // 검색 이력 저장
+                val searchHistoryDto = SearchHistory(
+                    time = Date(System.currentTimeMillis()),
+                    searchName = selectedSearchName
+                )
+                localDatabaseViewModel.insertHistory(searchHistoryDto) // INSERT
+
                 // 검색 결과 호출
                 naverOpenApiManager.getMovieInfo(partTitle = selectedSearchName,
                     success = { list, nextPage ->
