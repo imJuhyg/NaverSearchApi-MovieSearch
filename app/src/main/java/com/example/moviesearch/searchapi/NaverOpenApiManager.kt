@@ -1,5 +1,6 @@
 package com.example.moviesearch.searchapi
 
+import android.util.Log
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -13,7 +14,7 @@ class NaverOpenApiManager : RetrofitManager(NAVER_OPEN_API_URL) {
         private const val CLIENT_SECRET = "ZUVF06lS3m"
     }
 
-    fun getMovieInfo(startIndex: Int = 1, partTitle: String,
+    fun getMovieInfo(startIndex: Int = 1, partTitle: String?,
                      success: (List<MovieDTO>, nextPage: Int) -> Unit,
                      failure: (Throwable) -> Unit) {
 
