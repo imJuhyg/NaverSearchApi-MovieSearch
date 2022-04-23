@@ -10,7 +10,7 @@ interface NaverSearchApi {
         @Header("X-Naver-Client-Id") clientId: String,
         @Header("X-Naver-Client-Secret") clientSecret: String,
         @Path("searchType") searchType: String,
-        @Query("query") searchQuery: String,
+        @Query("query") searchQuery: String?,
         @Query("start") startIndex: Int
     ): Call<MovieItems>
 
