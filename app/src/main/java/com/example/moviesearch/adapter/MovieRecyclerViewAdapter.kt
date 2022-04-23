@@ -41,9 +41,9 @@ class MovieRecyclerViewAdapter(private val context: Context) : RecyclerView.Adap
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val movieItem = movieItems[position]
         holder.apply {
-            titleTextView.text = movieItem.title
-            pubDateTextView.text = movieItem.pubDate
-            userRatingTextView.text = movieItem.userRating
+            titleTextView.text = String.format("제목 : %s", movieItem.title)
+            pubDateTextView.text = String.format("출시: %s", movieItem.pubDate)
+            userRatingTextView.text = String.format("평점: %s", movieItem.userRating)
 
             // Glide
             Glide.with(context)
@@ -62,9 +62,7 @@ class MovieRecyclerViewAdapter(private val context: Context) : RecyclerView.Adap
     }
 
     fun addItem(movieList: List<MovieDTO>) {
-        for(movie in movieList) {
-            movieItems.add(movie)
-        }
+        movieList.forEach { movieItems.add(it) }
         notifyItemInserted(movieItems.size-1)
     }
 
