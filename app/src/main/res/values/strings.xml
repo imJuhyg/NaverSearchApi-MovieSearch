@@ -3,4 +3,6 @@
     <string name="edit_text_search_hint">영화 제목 입력</string>
     <string name="button_search">검색</string>
     <string name="button_search_history">최근검색</string>
+    <string name="recently_search_history">최근 검색 이력</string>
+    <string name="no_search_history">검색 내역이 없습니다.</string>
 </resources>

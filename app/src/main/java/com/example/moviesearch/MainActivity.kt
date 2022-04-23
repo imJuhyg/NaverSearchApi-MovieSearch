@@ -6,14 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviesearch.adapter.MovieRecyclerViewAdapter
 import com.example.moviesearch.databinding.ActivityMainBinding
-import com.example.moviesearch.repository.LocalDatabaseRepository
 import com.example.moviesearch.restapi.NaverOpenApiManager
-import com.example.moviesearch.room.dao.SearchHistoryDao
 import com.example.moviesearch.room.entities.SearchHistory
 import com.example.moviesearch.viewmodel.LocalDatabaseViewModel
 import java.util.*
@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private val localDatabaseViewModel by lazy {
         ViewModelProvider(this).get(LocalDatabaseViewModel::class.java)
     }
+    private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private var searchedMovieTitle: String? = null
     private var nextPage: Int = -1
 
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Setup RecyclerView
         binding.recyclerViewMovie.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewMovie.adapter = movieRecyclerViewAdapter
 
@@ -112,17 +114,36 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // 검색 이력 Observer
-        localDatabaseViewModel.searchNameLiveData.observe(this, {
-            it.forEach { Log.d("observe", it) }
-            // TODO
-            // 1. Intent 로 검색 이력 넘기고
-            // 2. NewActivity 에서 검색 이력 아이템 클릭하면
-            // 3. startActivityForResult 로 검색 이력 결과 받아서 EditText 에 넣고 RecyclerView 에 표시
+        // Start 'SearchHistoryActivity' for Result
+        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if(result.resultCode == RESULT_OK) { // 최근 검색 이력을 클릭했을 때만 실행
+                movieRecyclerViewAdapter.clearItem()
+                val selectedSearchName = result.data?.getStringExtra("SEARCH_NAME")
+                selectedSearchName?.let { binding.editTextSearch.setText(it) }
+                // 검색 결과 호출
+                naverOpenApiManager.getMovieInfo(partTitle = selectedSearchName,
+                    success = { list, nextPage ->
+                        if(list.isEmpty()) {
+                            Toast.makeText(this, "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show()
 
-        })
+                        } else {
+                            // 검색 결과를 추가하기 위해 검색명 쿼리와 next start 쿼리 저장
+                            searchedMovieTitle = selectedSearchName
+                            this.nextPage = nextPage
+
+                            movieRecyclerViewAdapter.addItem(list) // Add item
+                        }
+
+                    }, failure = {
+                        // TODO Error handling
+                        it.printStackTrace()
+                    }
+                )
+            }
+        }
         binding.buttonSearchHistory.setOnClickListener { // '최근검색' click event
-            localDatabaseViewModel.getSearchHistory(limit = 10) // 시간 상위 10개 까지 검색 이력 호출
+            val intent = Intent(this, SearchHistoryActivity::class.java)
+            activityResultLauncher.launch(intent)
         }
     }
 }
