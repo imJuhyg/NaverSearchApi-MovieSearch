@@ -1,19 +1,22 @@
 package com.example.moviesearch
 
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.moviesearch.adapter.MovieRecyclerView
+import com.example.moviesearch.adapter.MovieRecyclerViewAdapter
 import com.example.moviesearch.databinding.ActivityMainBinding
 import com.example.moviesearch.searchapi.NaverOpenApiManager
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val naverOpenApiManager by lazy { NaverOpenApiManager() }
-    private val movieRecyclerViewAdapter by lazy { MovieRecyclerView(this) }
+    private val movieRecyclerViewAdapter by lazy { MovieRecyclerViewAdapter(this) }
     private var searchedMovieTitle: String? = null
     private var nextPage: Int = -1
 
@@ -80,6 +83,16 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this@MainActivity, "마지막 결과입니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
+            }
+        })
+
+        // RecyclerView Item click event
+        movieRecyclerViewAdapter.setOnItemClickListener(object: MovieRecyclerViewAdapter.OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                // 영화 검색 결과 인텐트 표시
+                val movieInfoLink = movieRecyclerViewAdapter.getItem(position).movieLink
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(movieInfoLink))
+                startActivity(intent)
             }
         })
     }

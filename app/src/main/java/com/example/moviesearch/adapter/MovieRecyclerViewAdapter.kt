@@ -1,7 +1,6 @@
 package com.example.moviesearch.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,14 +11,26 @@ import com.bumptech.glide.Glide
 import com.example.moviesearch.R
 import com.example.moviesearch.searchapi.MovieDTO
 
-class MovieRecyclerView(private val context: Context) : RecyclerView.Adapter<MovieRecyclerView.ViewHolder>() {
+class MovieRecyclerViewAdapter(private val context: Context) : RecyclerView.Adapter<MovieRecyclerViewAdapter.ViewHolder>() {
     private val movieItems by lazy { ArrayList<MovieDTO>() }
+    private lateinit var onItemClickListener: OnItemClickListener
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    interface OnItemClickListener {
+        fun onItemClick(position: Int)
+    }
+
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleTextView: TextView = view.findViewById(R.id.movie_title)
         val pubDateTextView: TextView = view.findViewById(R.id.movie_pub_date)
         val userRatingTextView: TextView = view.findViewById(R.id.movie_rating)
         val movieImageView: ImageView = view.findViewById(R.id.movie_image_view)
+
+        init {
+            view.setOnClickListener {
+                val position = bindingAdapterPosition
+                if(position != RecyclerView.NO_POSITION) onItemClickListener.onItemClick(position)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -43,6 +54,12 @@ class MovieRecyclerView(private val context: Context) : RecyclerView.Adapter<Mov
     }
 
     override fun getItemCount(): Int = movieItems.size
+
+    fun getItem(position: Int): MovieDTO = movieItems[position]
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        onItemClickListener = listener
+    }
 
     fun addItem(movieList: List<MovieDTO>) {
         for(movie in movieList) {
