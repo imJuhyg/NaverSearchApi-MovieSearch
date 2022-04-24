@@ -16,6 +16,7 @@ abstract class RetrofitManager(private val baseUrl: String) {
         })
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS)
         client.addInterceptor(loggingInterceptor)
+
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())

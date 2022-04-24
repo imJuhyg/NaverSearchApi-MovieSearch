@@ -16,7 +16,7 @@
         app:layout_constraintLeft_toLeftOf="parent"/>
 
     <TextView
-        android:id="@+id/movie_title"
+        android:id="@+id/movie_title_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constrainedWidth="true"
@@ -25,23 +25,23 @@
         app:layout_constraintWidth_percent="0.75"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toRightOf="@id/movie_image_view"
-        app:layout_constraintBottom_toTopOf="@id/movie_pub_date"/>
+        app:layout_constraintBottom_toTopOf="@id/movie_pub_date_text_view"/>
 
     <TextView
-        android:id="@+id/movie_pub_date"
+        android:id="@+id/movie_pub_date_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintWidth_percent="0.75"
-        app:layout_constraintTop_toBottomOf="@id/movie_title"
+        app:layout_constraintTop_toBottomOf="@id/movie_title_text_view"
         app:layout_constraintLeft_toRightOf="@id/movie_image_view"
-        app:layout_constraintBottom_toTopOf="@id/movie_rating"/>
+        app:layout_constraintBottom_toTopOf="@id/movie_rating_text_view"/>
 
     <TextView
-        android:id="@+id/movie_rating"
+        android:id="@+id/movie_rating_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintWidth_percent="0.75"
-        app:layout_constraintTop_toBottomOf="@id/movie_pub_date"
+        app:layout_constraintTop_toBottomOf="@id/movie_pub_date_text_view"
         app:layout_constraintBottom_toBottomOf="@id/movie_image_view"
         app:layout_constraintLeft_toRightOf="@id/movie_image_view"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

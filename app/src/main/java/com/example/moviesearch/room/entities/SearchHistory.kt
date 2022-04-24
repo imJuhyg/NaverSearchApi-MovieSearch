@@ -8,8 +8,8 @@ import java.util.*
 @Entity
 data class SearchHistory(
     @PrimaryKey(autoGenerate = true) var id: Int,
-    @ColumnInfo var time: Date,
-    @ColumnInfo var searchName: String
+    @ColumnInfo var dateTime: Date,
+    @ColumnInfo var searchWord: String
 ) {
-    constructor(time: Date, searchName: String) : this(0, time, searchName)
+    constructor(dateTime: Date, searchWord: String) : this(0, dateTime, searchWord)
 }

@@ -2,14 +2,10 @@ package com.example.moviesearch
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.view.ViewTreeObserver
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.moviesearch.adapter.MovieTitleRecyclerViewAdapter
+import com.example.moviesearch.adapter.SearchHistoryRecyclerViewAdapter
 import com.example.moviesearch.databinding.ActivitySearchHistoryBinding
 import com.example.moviesearch.util.CustomItemDecoration
 import com.example.moviesearch.viewmodel.LocalDatabaseViewModel
@@ -19,7 +15,7 @@ class SearchHistoryActivity : AppCompatActivity() {
     private val localDatabaseViewModel by lazy {
         ViewModelProvider(this).get(LocalDatabaseViewModel::class.java)
     }
-    private val movieTitleRecyclerViewAdapter by lazy { MovieTitleRecyclerViewAdapter() }
+    private val movieTitleRecyclerViewAdapter by lazy { SearchHistoryRecyclerViewAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,17 +30,17 @@ class SearchHistoryActivity : AppCompatActivity() {
         }
 
         // 검색 이력 Observer
-        localDatabaseViewModel.searchNameLiveData.observe(this, {
-            it.forEach { Log.d("debug", it) }
+        localDatabaseViewModel.searchHistoryLiveData.observe(this, {
             if(it.isEmpty()) binding.noSearchHistoryTextView.visibility = View.VISIBLE
             else movieTitleRecyclerViewAdapter.addItem(it) // Add item
         })
         localDatabaseViewModel.getSearchHistory(10) // 검색 이력 가져오기
 
-        movieTitleRecyclerViewAdapter.setOnItemClickListener(object: MovieTitleRecyclerViewAdapter.OnItemClickListener {
+        // 리사이클러뷰 아이템 클릭 이벤트
+        movieTitleRecyclerViewAdapter.setOnItemClickListener(object: SearchHistoryRecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
                 val movieTitle = movieTitleRecyclerViewAdapter.getItem(position)
-                val intent = intent.putExtra("SEARCH_NAME", movieTitle)
+                val intent = intent.putExtra("SEARCH_WORD", movieTitle)
                 setResult(RESULT_OK, intent)
                 finish()
             }

@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.moviesearch.R
-import com.example.moviesearch.restapi.MovieDTO
+import com.example.moviesearch.restapi.naveropenapi.MovieDTO
 
 class MovieRecyclerViewAdapter(private val context: Context) : RecyclerView.Adapter<MovieRecyclerViewAdapter.ViewHolder>() {
     private val movieItems by lazy { ArrayList<MovieDTO>() }
@@ -20,9 +20,9 @@ class MovieRecyclerViewAdapter(private val context: Context) : RecyclerView.Adap
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titleTextView: TextView = view.findViewById(R.id.movie_title)
-        val pubDateTextView: TextView = view.findViewById(R.id.movie_pub_date)
-        val userRatingTextView: TextView = view.findViewById(R.id.movie_rating)
+        val titleTextView: TextView = view.findViewById(R.id.movie_title_text_view)
+        val pubDateTextView: TextView = view.findViewById(R.id.movie_pub_date_text_view)
+        val userRatingTextView: TextView = view.findViewById(R.id.movie_rating_text_view)
         val movieImageView: ImageView = view.findViewById(R.id.movie_image_view)
 
         init {
