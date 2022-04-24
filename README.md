@@ -1,5 +1,24 @@
 # Subject_MovieSearch
+## 목차
+[프로젝트 개요](#프로젝트-개요)  
+[아키텍쳐](#아키텍쳐)  
+[기술 스택](#기술-스택)  
+[기타 고려 사항](#기타-고려-사항)  
+[API Version Test](#api-version-test)
+
 ---
+## 프로젝트 개요
+* 네이버 영화 검색 API를 이용한 영화 검색 및 검색 이력 저장 애플리케이션
+* REST API 이해와 활용
+* Room Database를 활용한 내부 저장소 구축
+* 최신 검색 이력을 호출하는 Query문 이해
+
+---
+## 아키텍쳐
+<img width="80%" src="/readme_resource/architecture.png"/>
+
+---
+
 ## 기술 스택
 ### Retrofit - 네이버 영화 검색 API 호출
 <b>추가 고려 사항</b>  
