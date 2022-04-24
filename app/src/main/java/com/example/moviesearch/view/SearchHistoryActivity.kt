@@ -49,7 +49,7 @@ class SearchHistoryActivity : AppCompatActivity() {
         })
 
         // Room DB - 검색 이력 호출 에러 발생 observer
-        localDatabaseViewModel.isSelectedFailedLiveData.observe(this, {
+        localDatabaseViewModel.isSelectFailedLiveData.observe(this, {
             Toast.makeText(this, "검색 이력 불러오기를 실패했습니다.", Toast.LENGTH_SHORT).show()
         })
     }

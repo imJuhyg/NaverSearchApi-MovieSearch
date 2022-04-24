@@ -15,7 +15,7 @@ class LocalDatabaseViewModel(application: Application) : AndroidViewModel(applic
     private val isSelectFailedMutableLiveData by lazy { MutableLiveData<Boolean>() }
     private val isInsertFailedMutableLiveData by lazy { MutableLiveData<Boolean>() }
     var searchHistoryLiveData: LiveData<List<String>> = searchHistoryMutableLiveData
-    var isSelectedFailedLiveData: LiveData<Boolean> = isSelectFailedMutableLiveData
+    var isSelectFailedLiveData: LiveData<Boolean> = isSelectFailedMutableLiveData
     var isInsertFailedLiveData: LiveData<Boolean> = isInsertFailedMutableLiveData
 
     // Room DB 검색 이력 호출
