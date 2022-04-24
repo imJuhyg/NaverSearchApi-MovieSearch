@@ -11,9 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MovieSearch">
-        <activity android:name=".SearchHistoryActivity"></activity>
+        <activity android:name=".view.SearchHistoryActivity"></activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".view.MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
