@@ -24,11 +24,11 @@ class LocalDatabaseRepository private constructor() {
     // Entity: SearchHistory
     // 기능: limit 만큼의 최신 검색 이력 가져오기
     suspend fun getSearchHistory(limit: Int): List<String> = withContext(Dispatchers.IO) {
-        localDatabase.searchHistoryDao().getSearchHistory(limit)
+        localDatabase.searchHistoryDAO().getSearchHistory(limit)
     }
 
     // 기능: System time, searchName 정보를 담아 테이블에 저장
-    suspend fun insertSearchHistory(searchHistoryDto: SearchHistory) = withContext(Dispatchers.IO) {
-        localDatabase.searchHistoryDao().insertSearchHistory(searchHistoryDto)
+    suspend fun insertSearchHistory(searchHistoryDTO: SearchHistory) = withContext(Dispatchers.IO) {
+        localDatabase.searchHistoryDAO().insertSearchHistory(searchHistoryDTO)
     }
 }

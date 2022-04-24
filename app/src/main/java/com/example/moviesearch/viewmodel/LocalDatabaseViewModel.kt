@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class LocalDatabaseViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: LocalDatabaseRepository by lazy { LocalDatabaseRepository.getInstance(application) }
-    val searchNameLiveData by lazy { MutableLiveData<List<String>>() }
+    val searchHistoryLiveData by lazy { MutableLiveData<List<String>>() }
     val isInserted by lazy { MutableLiveData<Boolean>() }
 
     fun getSearchHistory(limit: Int) {
@@ -20,7 +20,7 @@ class LocalDatabaseViewModel(application: Application) : AndroidViewModel(applic
                 repository.getSearchHistory(limit)
 
             }.onSuccess { result -> // Result 반환
-                searchNameLiveData.value = result
+                searchHistoryLiveData.value = result
 
             }.onFailure { // Throwable 반환
                 // TODO 에러 처리

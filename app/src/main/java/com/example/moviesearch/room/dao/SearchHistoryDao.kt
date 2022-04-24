@@ -6,10 +6,13 @@ import androidx.room.Query
 import com.example.moviesearch.room.entities.SearchHistory
 
 @Dao
-interface SearchHistoryDao {
-    @Query("SELECT searchName FROM SearchHistory WHERE time IN (SELECT MAX(time) FROM SearchHistory GROUP BY searchName) ORDER BY time DESC LIMIT :limit")
+interface SearchHistoryDAO {
+    @Query("SELECT searchWord FROM SearchHistory " +
+            "WHERE dateTime IN (SELECT MAX(dateTime) FROM SearchHistory GROUP BY searchWord) " +
+            "ORDER BY dateTime DESC " +
+            "LIMIT :limit")
     fun getSearchHistory(limit: Int): List<String>
 
     @Insert
-    fun insertSearchHistory(searchHistoryDto: SearchHistory)
+    fun insertSearchHistory(searchHistoryDTO: SearchHistory)
 }

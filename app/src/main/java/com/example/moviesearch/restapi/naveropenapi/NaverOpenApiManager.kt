@@ -1,5 +1,7 @@
-package com.example.moviesearch.restapi
+package com.example.moviesearch.restapi.naveropenapi
 
+import android.util.Log
+import com.example.moviesearch.restapi.RetrofitManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -13,36 +15,42 @@ class NaverOpenApiManager : RetrofitManager(NAVER_OPEN_API_URL) {
         private const val CLIENT_SECRET = "ZUVF06lS3m"
     }
 
-    fun getMovieInfo(startIndex: Int = 1, partTitle: String?,
-                     success: (List<MovieDTO>, nextPage: Int) -> Unit,
+    /**
+     * 영화 검색 API:
+     * startIndex = 검색 시작 위치, searchWord = 검색어
+     * success = 성공시 콜백, failure = 실패시 콜백
+     */
+    fun getMovieInfo(startIndex: Int = 1, searchWord: String?,
+                     success: (List<MovieDTO>, nextIndex: Int) -> Unit,
                      failure: (Throwable) -> Unit) {
 
         val call = movieSearchApi.searchData(
             CLIENT_ID,
             CLIENT_SECRET,
             "movie.json",
-            partTitle,
+            searchWord,
             startIndex
-        ) // url ex) https://openapi.naver.com/v1/movie.json?query={parTitle}&startIndex={startIndex}
+        ) // url ex) https://openapi.naver.com/v1/movie.json?query={searchWord}&startIndex={startIndex}
 
         call.enqueue(object: Callback<MovieItems> {
             override fun onResponse(call: Call<MovieItems>, response: Response<MovieItems>) {
                 if(response.isSuccessful) {
                     val results = response.body()!!
 
-                    // nextPage: 있으면 다음 page 없으면 -1
-                    val nextPage = if(results.start+results.display <= results.total) {
+                    // start+display = 다음 인덱스
+                    val nextIndex = if(results.start+results.display <= results.total) {
                         results.start+results.display
                     } else {
-                        -1
+                        -1 // 다음 인덱스가 없는 경우
                     }
 
                     // 불필요한 태그 삭제
-                    for(item in results.items) {
-                        item.title = item.title.replace("(<b>|</b>)".toRegex(), "")
+                    for(movieDTO in results.items) {
+                        // TODO 영화 제목에 '&' 가 들어가면 &amp;로 출력됨
+                        movieDTO.title = movieDTO.title.replace("(<b>|</b>)".toRegex(), "")
                     }
 
-                    success(results.items, nextPage) // List<MovieDTO>, nextPage
+                    success(results.items, nextIndex) // Callback List<MovieDTO>, nextIndex
                 }
             }
 
