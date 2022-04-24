@@ -15,7 +15,7 @@
 
 ---
 ## 아키텍쳐
-<img width="80%" src="/readme_resource/architecture.png"/>
+<img src="/readme_resource/architecture.png"/>
 
 ---
 
