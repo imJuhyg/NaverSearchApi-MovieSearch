@@ -26,7 +26,7 @@
 |searchWord|String|NotNull||검색어|
 
 ### 쿼리
-* time 기준 내림차순 정렬/ limit으로 검색 결과 개수 제한
+* dateTime 기준 내림차순 정렬/ limit으로 검색 결과 개수 제한
 * Auto Increment를 통한 내림차순 정렬도 가능하나, 사용 용도와는 맞지 않는것 같아 Date타입의 필드를 하나 만들고 저장시간 기준 내림차순 정렬을 사용하기로 결정했습니다.
 ```kotlin
 @Query("SELECT searchWord FROM SearchHistory ORDER BY dateTime DESC LIMIT :limit")
