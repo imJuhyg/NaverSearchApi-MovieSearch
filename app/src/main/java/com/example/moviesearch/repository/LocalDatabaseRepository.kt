@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.moviesearch.room.databases.LocalDatabase
 import com.example.moviesearch.room.entities.SearchHistory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
 class LocalDatabaseRepository private constructor() {

@@ -1,4 +1,4 @@
-package com.example.moviesearch.restapi.naveropenapi
+package com.example.moviesearch.restapi.naversearchapi
 
 import com.google.gson.annotations.SerializedName
 

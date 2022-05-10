@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviesearch.adapter.MovieRecyclerViewAdapter
 import com.example.moviesearch.databinding.ActivityMainBinding
-import com.example.moviesearch.restapi.naveropenapi.NaverOpenApiManager
+import com.example.moviesearch.restapi.naversearchapi.NaverSearchManager
 import com.example.moviesearch.room.entities.SearchHistory
 import com.example.moviesearch.viewmodel.LocalDatabaseViewModel
 import java.net.SocketTimeoutException
@@ -22,7 +22,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val naverOpenApiManager by lazy { NaverOpenApiManager() }
+    private val naverOpenApiManager by lazy { NaverSearchManager() }
     private val movieRecyclerViewAdapter by lazy { MovieRecyclerViewAdapter(this) }
     private val localDatabaseViewModel by lazy {
         ViewModelProvider(this).get(LocalDatabaseViewModel::class.java)
