@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.moviesearch.R
-import com.example.moviesearch.restapi.naveropenapi.MovieDTO
+import com.example.moviesearch.restapi.naversearchapi.movieapi.MovieDTO
 
 class MovieRecyclerViewAdapter(private val context: Context) : RecyclerView.Adapter<MovieRecyclerViewAdapter.ViewHolder>() {
     private val movieItems by lazy { ArrayList<MovieDTO>() }

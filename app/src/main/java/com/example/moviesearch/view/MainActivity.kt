@@ -13,19 +13,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.moviesearch.adapter.MovieRecyclerViewAdapter
 import com.example.moviesearch.databinding.ActivityMainBinding
-import com.example.moviesearch.restapi.naveropenapi.NaverOpenApiManager
 import com.example.moviesearch.room.entities.SearchHistory
 import com.example.moviesearch.viewmodel.LocalDatabaseViewModel
+import com.example.moviesearch.viewmodel.SearchApiViewModel
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val naverOpenApiManager by lazy { NaverOpenApiManager() }
     private val movieRecyclerViewAdapter by lazy { MovieRecyclerViewAdapter(this) }
     private val localDatabaseViewModel by lazy {
         ViewModelProvider(this).get(LocalDatabaseViewModel::class.java)
+    }
+    private val searchApiViewModel by lazy {
+        ViewModelProvider(this).get(SearchApiViewModel::class.java)
     }
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var searchedWord: String
@@ -41,6 +43,22 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerViewMovie.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewMovie.adapter = movieRecyclerViewAdapter
 
+        // 검색 결과 Observer
+        searchApiViewModel.searchResult.observe(this, { movieList ->
+            if(movieList.isEmpty())  Toast.makeText(this, "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show()
+            else movieRecyclerViewAdapter.addItem(movieList) // Add item
+        })
+        searchApiViewModel.nextIndex.observe(this, { nextIndex ->
+            this.nextIndex = nextIndex // 다음 검색 결과를 위해 nextIndex 저장
+        })
+
+        searchApiViewModel.errorCode.observe(this, { errorCode ->
+            showToastFailureResponse(errorCode)
+        })
+        searchApiViewModel.throwable.observe(this, { throwable ->
+            showToastErrorResponse(throwable)
+        })
+
         binding.searchButton.setOnClickListener { // '검색' 버튼을 클릭했을 때
             movieRecyclerViewAdapter.clearItem()
             keyboard.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0) // 키보드 숨기기
@@ -53,25 +71,7 @@ class MainActivity : AppCompatActivity() {
                 insertSearchHistory(searchedWord) // 검색 이력 저장
 
                 // 검색 결과 호출(rest api)
-                naverOpenApiManager.getMovieInfo(
-                    searchWord = searchedWord,
-                    onSuccess = { movieList, nextIndex -> // callback
-                        if(movieList.isEmpty()) {
-                            Toast.makeText(this, "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show()
-
-                        } else {
-                            // 다음 검색 결과를 위해 nextIndex 저장
-                            this.nextIndex = nextIndex
-                            movieRecyclerViewAdapter.addItem(movieList) // Add item
-                        }
-                    },
-                    onFailure = { errorCode ->  // callback
-                        showToastFailureResponse(errorCode)
-                    },
-                    onError = { throwable -> // callback
-                        showToastErrorResponse(throwable)
-                    }
-                )
+                searchApiViewModel.searchMovie(searchQuery = searchedWord)
             }
         }
 
@@ -87,23 +87,9 @@ class MainActivity : AppCompatActivity() {
 
                 // 최소 한 개 이상의 아이템이 있고, 마지막 아이템을 보고 있는 경우
                 if(totalItemCount != 0 && lastVisibleItemPosition == totalItemCount-1) {
-                    if(nextIndex > 0) { // 결과가 더 있는 경우에만 API call
-                        naverOpenApiManager.getMovieInfo(
-                            startIndex = nextIndex,
-                            searchWord = searchedWord,
-                            onSuccess = { movieList, nextIndex ->
-                                this@MainActivity.nextIndex = nextIndex
-                                movieRecyclerViewAdapter.addItem(movieList)
-                            },
-                            onFailure = { errorCode ->
-                                showToastFailureResponse(errorCode)
-                            },
-                            onError = { throwable ->
-                                showToastErrorResponse(throwable)
-                            })
-                    } else {
-                        Toast.makeText(this@MainActivity, "마지막 결과입니다.", Toast.LENGTH_SHORT).show()
-                    }
+                    // 결과가 더 있는 경우에만 API call
+                    if(nextIndex > 0) searchApiViewModel.searchMovie(startIndex = nextIndex, searchQuery = searchedWord)
+                    else Toast.makeText(this@MainActivity, "마지막 결과입니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         })
@@ -129,23 +115,7 @@ class MainActivity : AppCompatActivity() {
                     insertSearchHistory(searchedWord) // 검색 이력 저장
 
                     // 검색 결과 호출(rest api)
-                    naverOpenApiManager.getMovieInfo(
-                        searchWord = searchedWord,
-                        onSuccess = { movieList, nextIndex ->
-                            if(movieList.isEmpty()) {
-                                Toast.makeText(this, "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show()
-
-                            } else {
-                                this.nextIndex = nextIndex
-                                movieRecyclerViewAdapter.addItem(movieList) // Add item
-                            }
-                        },
-                        onFailure = { errorCode ->
-                            showToastFailureResponse(errorCode)
-                        },
-                        onError = { throwable ->
-                            showToastErrorResponse(throwable)
-                        })
+                    searchApiViewModel.searchMovie(searchQuery = searchedWord)
                 }
             }
         }

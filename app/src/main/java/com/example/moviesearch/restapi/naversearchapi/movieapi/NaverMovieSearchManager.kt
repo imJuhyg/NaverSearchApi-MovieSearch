@@ -1,34 +1,28 @@
-package com.example.moviesearch.restapi.naveropenapi
+package com.example.moviesearch.restapi.naversearchapi.movieapi
 
-import com.example.moviesearch.restapi.RetrofitManager
+import com.example.moviesearch.restapi.naversearchapi.NaverSearchManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class NaverOpenApiManager : RetrofitManager(NAVER_OPEN_API_URL) {
-    private val movieSearchApi = getRetrofit().create(NaverSearchApi::class.java)
+class NaverMovieSearchManager : NaverSearchManager<MovieDTO>() {
+    private val movieSearchApi = getRetrofit().create(NaverMovieSearchApi::class.java)
 
-    companion object {
-        private const val NAVER_OPEN_API_URL = "https://openapi.naver.com/v1/"
-        private const val CLIENT_ID = "U3EGn6EooBj0_Kkc5iJU"
-        private const val CLIENT_SECRET = "ZUVF06lS3m"
-    }
+    // 영화 검색 API
+    override fun searchInfo(
+        startIndex: Int,
+        searchQuery: String,
+        onSuccess: (resultList: List<MovieDTO>, nextIndex: Int) -> Unit,
+        onFailure: (errorCode: Int) -> Unit,
+        onError: (throwable: Throwable) -> Unit
+    ) {
 
-    /**
-     * 영화 검색 API:
-     * startIndex = 검색 시작 위치, searchWord = 검색어
-     * success = 성공시 콜백, failure = 실패시 콜백
-     */
-    fun getMovieInfo(startIndex: Int = 1, searchWord: String?,
-                     onSuccess: (movieList: List<MovieDTO>, nextIndex: Int) -> Unit,
-                     onFailure: (errorCode: Int) -> Unit,
-                     onError: (throwable: Throwable) -> Unit) {
-
+        // 호출할 URL 구성
         val call = movieSearchApi.searchData(
             CLIENT_ID,
             CLIENT_SECRET,
             "movie.json",
-            searchWord,
+            searchQuery,
             startIndex
         ) // url ex) https://openapi.naver.com/v1/movie.json?query={searchWord}&startIndex={startIndex}
 
@@ -38,10 +32,8 @@ class NaverOpenApiManager : RetrofitManager(NAVER_OPEN_API_URL) {
                     response.isSuccessful -> {
                         val results = response.body()!!
 
-                        // start+display = 다음 인덱스
-                        val nextIndex = if(results.start+results.display <= results.total) {
-                            results.start+results.display
-                        } else -1 // 다음 인덱스가 없는 경우
+                        // 다음 인덱스 구하기
+                        val nextIndex = getNextIndex(results.start, results.display, results.total)
 
                         for(movieDTO in results.items) {
                             movieDTO.title = movieDTO.title.replace("&amp;", "&") // '&amp;'로 출력되는 결과 -> '&'으로 변경

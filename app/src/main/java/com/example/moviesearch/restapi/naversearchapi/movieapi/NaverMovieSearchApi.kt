@@ -1,4 +1,4 @@
-package com.example.moviesearch.restapi.naveropenapi
+package com.example.moviesearch.restapi.naversearchapi.movieapi
 
 import retrofit2.Call
 import retrofit2.http.GET
@@ -6,7 +6,7 @@ import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface NaverSearchApi {
+interface NaverMovieSearchApi {
     /**
      * searchType: 검색 종류 ex) movie.json, news.json, book.json ...
      * searchQuery: 검색어

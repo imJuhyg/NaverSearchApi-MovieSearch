@@ -1,4 +1,4 @@
-package com.example.moviesearch.restapi.naveropenapi
+package com.example.moviesearch.restapi.naversearchapi.movieapi
 
 import com.google.gson.annotations.SerializedName
 
@@ -17,3 +17,4 @@ data class MovieDTO(
     val userRating: String,
     val pubDate: String
 )
+

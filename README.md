@@ -8,14 +8,12 @@
 
 ---
 ## 프로젝트 개요
-* 네이버 영화 검색 API를 이용한 영화 검색 및 검색 이력 저장 애플리케이션
-* REST API 이해와 활용
-* Room Database를 활용한 내부 저장소 구축
-* 최신 검색 이력을 호출하는 Query문 이해
-
+* 네이버 검색 API를 이용하여 영화 검색 및 검색 이력 저장을 구현한 애플리케이션입니다.
+* REST API 활용 외에도 Room Database를 이용한 검색 이력 저장에 대한 내용도 포함되어 있습니다.
+* 이 프로젝트를 제작하기 위해서 [REST API 개념 및 Retrofit 실습](https://github.com/imJuhyg/restapi-study)에 대한 내용도 정리했습니다.
 ---
 ## 아키텍쳐
-<img src="/readme_resource/architecture.png"/>
+<img src="./readme_resource/architecture.png"/>
 
 ---
 
