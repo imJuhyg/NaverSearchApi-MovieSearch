@@ -1,9 +1,11 @@
 # NaverSearchApi-MovieSearch-Sample
 ## 목차
-[프로젝트 개요](#프로젝트-개요)  
+[프로젝트 개요](#프로젝트-개요)
+[기능](#기능)
+[미리보기](#미리보기)
 [아키텍쳐](#아키텍쳐)  
-[기술 스택](#기술-스택)  
-[기타 고려 사항](#기타-고려-사항)  
+[주요 기술 스택](#주요-기술-스택)  
+[주요 구현 기능](#주요-구현-기능)  
 [API Version Test](#api-version-test)
 
 ---
@@ -12,20 +14,30 @@
 * REST API 활용 외에도 Room Database를 이용한 검색 이력 저장에 대한 내용도 포함되어 있습니다.
 * 이 프로젝트를 제작하기 위해서 [REST API 개념 및 Retrofit 실습](https://github.com/imJuhyg/restapi-study)에 대한 내용도 정리했습니다.
 ---
+## 기능
+1. 네이버 영화를 검색할 수 있습니다.
+2. 검색한 영화를 클릭하면 네이버 영화 정보 페이지로 이동합니다.
+3. 검색 이력이 저장됩니다. 최근에 검색한 이력을 10개까지만 표시합니다.
+4. 검색 이력이 포함된 TextView를 누르면 해당 검색명을 통해 다시 검색합니다.
+---
+## 미리보기
+<img width="40%" src="./readme_resource/preview.gif">
+
+---
 ## 아키텍쳐
 ### MVVM  
 <img src="./readme_resource/architecture.png"/>
 
 ---
 
-## 기술 스택
+## 주요 기술 스택
 ### Retrofit - 네이버 영화 검색 API 호출
 ### Glide - 영화 썸네일 이미지 로딩
 ### Room Database - 최근 검색 이력 저장을 위한 로컬 데이터베이스
   
 ---
 ## 주요 구현 기능
-### 재사용성을 고려한 클래스 확장
+### 1. 재사용성을 고려한 클래스 확장
 * Open API를 사용하기 위한 레트로핏 객체를 추상 클래스로 정의하여 여러 클래스에서 상속 받을 수 있도록 정의했습니다.
 * NaverSearchManager는 네이버 검색 API의 모든 검색 타입을 사용할 수 있도록 확장성을 높인 추상 클래스입니다.
 * Naver 검색 API만을 위한 추상 클래스이며, 다음의 기능을 수행할 수 있습니다.  
@@ -84,66 +96,144 @@ abstract class NaverSearchManager<T: Any> : RetrofitManager(NAVER_SEARCH_API_URL
   } else -1
 }
 ```
+  
+### 2. 영화 검색 API 구현
+* 호출할 URL를 구성하고 Call.enqueue()를 통한 비동기 호출을 수행합니다.
+* 호출 결과에 따라 onSuccess, onFailure, onError 중 하나를 콜백합니다.
+```
+onSuccess
+결과값 호출에 성공한 경우에 콜백합니다. 결과값에는 DTO 객체가 담긴 List와 다음 검색의 시작 위치 nextIndex가 담겨있습니다.
 
+onFailure
+호출에는 성공했지만, 에러 코드를 반환한 경우에 콜백합니다. 결과값에는 errorCode가 담겨있습니다.
 
+onError
+호출에 실패한 경우입니다. 네트워크 문제 등으로 인해 발생할 수 있습니다. 결과값에는 Throwable이 담겨있습니다.
+```
+  
+#### NaverMovieSearchManager
+```kotlin
+class NaverMovieSearchManager : NaverSearchManager<MovieDTO>() {
+  private val movieSearchApi = getRetrofit().create(NaverMovieSearchApi::class.java)
 
+  // 영화 검색 API
+  override fun searchInfo(
+    startIndex: Int,
+    searchQuery: String,
+    onSuccess: (resultList: List<MovieDTO>, nextIndex: Int) -> Unit,
+    onFailure: (errorCode: Int) -> Unit,
+    onError: (throwable: Throwable) -> Unit
+  ) {
 
+    // 호출할 URL 구성
+    val call = movieSearchApi.searchData(
+      CLIENT_ID,
+      CLIENT_SECRET,
+      "movie.json",
+      searchQuery,
+      startIndex
+    ) // url ex) https://openapi.naver.com/v1/movie.json?query={searchWord}&startIndex={startIndex}
 
+    call.enqueue(object: Callback<MovieItems> { // 비동기 호출
+      override fun onResponse(call: Call<MovieItems>, response: Response<MovieItems>) {
+        when {
+          response.isSuccessful -> {
+            val results = response.body()!!
 
+            // 다음 인덱스 구하기
+            val nextIndex = getNextIndex(results.start, results.display, results.total)
 
+            for(movieDTO in results.items) {
+                movieDTO.title = movieDTO.title.replace("&amp;", "&") // '&amp;'로 출력되는 결과 -> '&'으로 변경
+                movieDTO.title = movieDTO.title.replace("(<b>|</b>)".toRegex(), "") // 불필요한 태그 삭제
+            }
+            onSuccess(results.items, nextIndex) // Callback List<MovieDTO>, nextIndex
+          }
 
+          // 응답에는 성공했지만 에러 코드인 경우
+          response.code() == 400 -> { // 잘못된 검색어 입력
+            onFailure(400)
+          }
 
+          response.code() == 500 -> { // 네이버 Open API 서버 에러
+            onFailure(500)
+          }
+        }
+      }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Retrofit - 네이버 영화 검색 API 호출
-<b>추가 고려 사항</b>  
-* 네이버 검색 API를 한번 호출 했을 때 출력 결과 건수는 10건(Default)이므로 다음 페이지 출력을 위해 '검색의 시작 위치+검색 결과 출력 건수(start+display)=다음 검색의 시작위치'를 결과 리스트와 함께 콜백합니다. 다음 검색의 시작 위치를 알고 있으므로 리사이클러뷰가 끝까지 스크롤되었을 때 다음 검색의 시작위치부터 10건의 검색 결과를 호출할 수 있습니다.
-
-* 잘못된 검색 결과(400) 또는 네이버 Open API 서버 에러(500)시 onFailure를 콜백하고 Toast로 사용자에게 알립니다.
-
-* 사용자의 디바이스가 네트워크를 사용할 수 없을 경우 onError를 콜백하고 Toast로 사용자에게 알립니다.
-
-* 검색 결과의 영화 제목에서 검색어와 일치하는 부분은 ```<b></b>``` 태그로 감싸져 있기 때문에 replace 메소드를 통해 태그를 삭제한 값으로 이름을 다시 저장합니다.
+      override fun onFailure(call: Call<MovieItems>, throwable: Throwable) { // 네트워크 에러
+        onError(throwable)
+      }
+    })
+  }
+}
+```
 
 &nbsp;
-### Glide - 영화 썸네일 이미지 로딩
-<b>추가 고려 사항</b>  
-* 검색 API의 결과에 영화 Link Url은 존재하지 않을 수 있으므로 Glide.error()를 통해 대체 이미지를 표시합니다.
+
+#### SearchApiViewModel 클래스를 통해 검색 결과를 요청하고 MainActivity에서 결과를 표시할 수 있습니다.
+#### MainActivity
+```kotlin
+binding.searchButton.setOnClickListener { // '검색' 버튼을 클릭했을 때
+  movieRecyclerViewAdapter.clearItem()
+  keyboard.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0) // 키보드 숨기기
+
+  if(binding.searchEditText.text.isEmpty()) {
+    Toast.makeText(this, "최소 한 자 이상의 검색어를 입력해 주세요.", Toast.LENGTH_SHORT).show()
+
+  } else { // EditText 에 글자가 입력된 경우
+    searchedWord = binding.searchEditText.text.toString()
+    insertSearchHistory(searchedWord) // 검색 이력 저장
+
+    // 검색 결과 호출(rest api)
+    searchApiViewModel.searchMovie(searchQuery = searchedWord)
+  }
+}
+```
+#### 리사이클러뷰의 스크롤을 끝까지 내릴 경우 다음 검색 위치부터 다시 검색을 시작합니다.
+```kotlin
+// 리사이클러뷰 스크롤을 마지막까지 내렸을 때 검색 결과 추가
+binding.recyclerViewMovie.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+  override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+    super.onScrolled(recyclerView, dx, dy)
+
+    val linearLayoutManager: LinearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
+    // 리사이클러뷰에 보여지고 있는 마지막 아이템의 position
+    val lastVisibleItemPosition = linearLayoutManager.findLastCompletelyVisibleItemPosition()
+    val totalItemCount = linearLayoutManager.itemCount // 전체 아이템 개수
+
+    // 최소 한 개 이상의 아이템이 있고, 마지막 아이템을 보고 있는 경우
+    if(totalItemCount != 0 && lastVisibleItemPosition == totalItemCount-1) {
+      // 결과가 더 있는 경우에만 API call
+      if(nextIndex > 0) searchApiViewModel.searchMovie(startIndex = nextIndex, searchQuery = searchedWord)
+      else Toast.makeText(this@MainActivity, "마지막 결과입니다.", Toast.LENGTH_SHORT).show()
+    }
+  }
+})
+```
 
 &nbsp;
-### Room - 최근 검색 이력 저장을 위한 로컬 데이터베이스
-### 테이블 설계  
-<b>SearchHistory</b>
+
+#### 구현 결과
+<img width="40%" src="./readme_resource/search.gif">
+
+&nbsp;
+
+### 3. 검색 이력 저장
+* 검색 이력 저장을 위해 내부 저장소인 Room Database를 사용했습니다.
+* 뷰에는 가장 최근에 검색한 이력 10개만 표시합니다.
+* MainActivity에서 검색을 수행하면 이력이 저장되고 SearchHistoryActivity에서 검색 이력을 불러옵니다.
+  
+#### 테이블 설계
+#### SearchHistory
 |Field|Type|Null|Pri|Ex|
 |---|---|---|---|---|
 |id|Int|NotNull|Pri|순번(auto increment)|
 |dateTime|Date|NotNull||시간 기준 내림차순 정렬을 위한 필드|
 |searchWord|String|NotNull||검색어|
 
-### 쿼리
+#### 쿼리
 * dateTime 기준 내림차순 정렬/ limit으로 검색 결과 개수 제한
-* Auto Increment를 통한 내림차순 정렬도 가능하나, 사용 용도와는 맞지 않는것 같아 Date타입의 필드를 하나 만들고 저장시간 기준 내림차순 정렬을 사용하기로 결정했습니다.
-```kotlin
-@Query("SELECT searchWord FROM SearchHistory ORDER BY dateTime DESC LIMIT :limit")
-fun getSearchHistory(limit: Int): List<SearchHistory>
-/* 동일한 이름의 검색 이력이 있을 경우 중복된 내용도 모두 포함하는 쿼리임. */
-```
-
-<b>추가 고려 사항</b>  
 * 동일한 검색 기록이 있을 때 가장 최근에 검색된 검색 기록 한개만 가져옵니다.
 ```kotlin
 // (1)-1 동일한 'searchWord'가 있을 경우 MAX(time)인 이력만 조건식 통과
@@ -154,41 +244,17 @@ fun getSearchHistory(limit: Int): List<SearchHistory>
        "ORDER BY dateTime DESC " + // (2)
        "LIMIT :limit")
 fun getSearchHistory(limit: Int): List<SearchHistory>
-
-/* 로그 */
-D/observe: name: 9, time: Sat Apr 23 21:24:51 GMT+09:00 2022
-D/observe: name: 8, time: Sat Apr 23 21:24:50 GMT+09:00 2022
-D/observe: name: 7, time: Sat Apr 23 21:24:45 GMT+09:00 2022
-D/observe: name: 6, time: Sat Apr 23 21:24:34 GMT+09:00 2022
-D/observe: name: 13, time: Sat Apr 23 21:24:17 GMT+09:00 2022
-D/observe: name: 12, time: Sat Apr 23 21:24:16 GMT+09:00 2022
-D/observe: name: 11, time: Sat Apr 23 21:24:14 GMT+09:00 2022
-D/observe: name: 10, time: Sat Apr 23 21:24:07 GMT+09:00 2022
-D/observe: name: 5, time: Sat Apr 23 21:23:59 GMT+09:00 2022
-D/observe: name: 4, time: Sat Apr 23 21:23:58 GMT+09:00 2022
 ```
 
-### TypeConverter  
-```kotlin
-/* Converters.class */
-class Converters {
-  @TypeConverter
-  fun fromTimestamp(timestamp: Long): Date = Date(timestamp)
+&nbsp;
 
-  @TypeConverter
-  fun dateToTimestamp(date: Date): Long = date.time
-}
-```
+#### 구현 결과
+<img width="40%" src="./readme_resource/history.gif">
+
+&nbsp;
 
 ---
-## 기타 고려 사항
-1. 영화 제목에 '&' 문장이 포함되어 있을 때 호출 결과가 ```&amp;```로 변경되어 나오는 것을 원래 문자 '&'로 변경하여 출력했습니다.
-2. 영화 제목 및 검색 이력이 TextView의 길이 이상으로 내용이 길어지는 경우 한 줄로 강제하고 끝 부분을 '...'으로 바꾸어 축약했습니다.
-3. 검색창이 비어있는 경우 API를 호출하지 않으며 Toast를 통해 사용자에게 알립니다.
-4. 검색 결과가 없을 경우 Toast를 통해 사용자에게 알립니다.
-5. 최근 검색 이력이 없을 때 TextView('검색 내역이 없습니다.')를 표시합니다.
-6. 키보드가 열려있을 때 '검색'버튼을 누르면 자동으로 키보드가 내려갑니다.
----
+
 ## API Version Test
 * <b>api 22 - 정상 작동</b>
 * <b>api 23 - 정상 작동</b>
