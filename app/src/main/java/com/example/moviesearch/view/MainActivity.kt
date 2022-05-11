@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Room DB - 검색 이력 삽입 에러 발생 observer
-        localDatabaseViewModel.isInsertFailedLiveData.observe(this, {
+        localDatabaseViewModel.isInsertFailed.observe(this, {
             Toast.makeText(this, "검색 이력 저장을 실패했습니다.", Toast.LENGTH_SHORT).show()
         })
     }
