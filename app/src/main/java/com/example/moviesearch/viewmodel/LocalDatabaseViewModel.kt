@@ -11,12 +11,12 @@ import kotlinx.coroutines.launch
 
 class LocalDatabaseViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: LocalDatabaseRepository by lazy { LocalDatabaseRepository.getInstance(application) }
-    private val searchHistoryMutableLiveData by lazy { MutableLiveData<List<String>>() }
-    private val isSelectFailedMutableLiveData by lazy { MutableLiveData<Boolean>() }
-    private val isInsertFailedMutableLiveData by lazy { MutableLiveData<Boolean>() }
-    var searchHistoryLiveData: LiveData<List<String>> = searchHistoryMutableLiveData
-    var isSelectFailedLiveData: LiveData<Boolean> = isSelectFailedMutableLiveData
-    var isInsertFailedLiveData: LiveData<Boolean> = isInsertFailedMutableLiveData
+    private val searchHistoryLiveData by lazy { MutableLiveData<List<String>>() }
+    private val isSelectFailedLiveData by lazy { MutableLiveData<Boolean>() }
+    private val isInsertFailedLiveData by lazy { MutableLiveData<Boolean>() }
+    val searchHistory: LiveData<List<String>> = searchHistoryLiveData
+    val isSelectFailed: LiveData<Boolean> = isSelectFailedLiveData
+    val isInsertFailed: LiveData<Boolean> = isInsertFailedLiveData
 
     // Room DB 검색 이력 호출
     fun getSearchHistory(limit: Int) {
@@ -25,10 +25,10 @@ class LocalDatabaseViewModel(application: Application) : AndroidViewModel(applic
                 repository.getSearchHistory(limit)
 
             }.onSuccess { result -> // Result 반환
-                searchHistoryMutableLiveData.value = result
+                searchHistoryLiveData.value = result
 
             }.onFailure { // Throwable 반환
-                isSelectFailedMutableLiveData.value = true // 검색에 실패했을 경우
+                isSelectFailedLiveData.value = true // 검색에 실패했을 경우
             }
         }
     }
@@ -40,7 +40,7 @@ class LocalDatabaseViewModel(application: Application) : AndroidViewModel(applic
                 repository.insertSearchHistory(searchHistoryDTO)
 
             }.onFailure {
-                isInsertFailedMutableLiveData.value = true // 삽입에 실패했을 경우
+                isInsertFailedLiveData.value = true // 삽입에 실패했을 경우
             }
         }
     }

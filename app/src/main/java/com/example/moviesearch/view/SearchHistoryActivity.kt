@@ -31,7 +31,7 @@ class SearchHistoryActivity : AppCompatActivity() {
         }
 
         // 검색 이력 Observer
-        localDatabaseViewModel.searchHistoryLiveData.observe(this, {
+        localDatabaseViewModel.searchHistory.observe(this, {
             if(it.isEmpty()) binding.noSearchHistoryTextView.visibility = View.VISIBLE
             else searchHistoryRecyclerViewAdapter.addItem(it) // Add item
         })
@@ -49,7 +49,7 @@ class SearchHistoryActivity : AppCompatActivity() {
         })
 
         // Room DB - 검색 이력 호출 에러 발생 observer
-        localDatabaseViewModel.isSelectFailedLiveData.observe(this, {
+        localDatabaseViewModel.isSelectFailed.observe(this, {
             Toast.makeText(this, "검색 이력 불러오기를 실패했습니다.", Toast.LENGTH_SHORT).show()
         })
     }

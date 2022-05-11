@@ -1,6 +1,5 @@
 package com.example.moviesearch.restapi.naversearchapi.movieapi
 
-import com.example.moviesearch.restapi.naversearchapi.MovieItems
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
