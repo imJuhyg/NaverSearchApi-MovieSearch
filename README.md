@@ -1,4 +1,4 @@
-# Subject_MovieSearch
+# NaverSearchApi-MovieSearch-Sample
 ## 목차
 [프로젝트 개요](#프로젝트-개요)  
 [아키텍쳐](#아키텍쳐)  
@@ -13,11 +13,102 @@
 * 이 프로젝트를 제작하기 위해서 [REST API 개념 및 Retrofit 실습](https://github.com/imJuhyg/restapi-study)에 대한 내용도 정리했습니다.
 ---
 ## 아키텍쳐
+### MVVM  
 <img src="./readme_resource/architecture.png"/>
 
 ---
 
 ## 기술 스택
+### Retrofit - 네이버 영화 검색 API 호출
+### Glide - 영화 썸네일 이미지 로딩
+### Room Database - 최근 검색 이력 저장을 위한 로컬 데이터베이스
+  
+---
+## 주요 구현 기능
+### 재사용성을 고려한 클래스 확장
+* Open API를 사용하기 위한 레트로핏 객체를 추상 클래스로 정의하여 여러 클래스에서 상속 받을 수 있도록 정의했습니다.
+* NaverSearchManager는 네이버 검색 API의 모든 검색 타입을 사용할 수 있도록 확장성을 높인 추상 클래스입니다.
+* Naver 검색 API만을 위한 추상 클래스이며, 다음의 기능을 수행할 수 있습니다.  
+```
+1. CLIENT_ID 및 CLIENT_SECRET 값을 정의할 수 있습니다.
+2. 제네릭으로 구현된 추상 클래스입니다. 제네릭 타입 T를 통해 여러가지 DTO타입을 외부에서 지정할 수 있습니다.
+   ex) MovieDTO, NewsDTO, BookDTO, ...
+3. 검색을 요청하는 메소드는 추상 메소드로 구현되어 외부에서 오버라이딩할 수 있습니다.
+4. 다음 검색의 시작 위치를 반환하는 일반 메소드를 사용할 수 있습니다.
+```
+  
+#### RetrofitManager
+```kotlin
+abstract class RetrofitManager(private val baseUrl: String) {
+  fun getRetrofit(): Retrofit {
+    return Retrofit.Builder()
+      .baseUrl(baseUrl)
+      .addConverterFactory(GsonConverterFactory.create())
+      .build()
+  }
+}
+```
+  
+#### NaverSearchManager
+```kotlin
+abstract class NaverSearchManager<T: Any> : RetrofitManager(NAVER_SEARCH_API_URL) {
+  // T: 결과로 받을 DTO 객체 타입을 명시. ex) MovieDTO, ...
+
+  protected val CLIENT_ID = "U3EGn6EooBj0_Kkc5iJU"
+  protected val CLIENT_SECRET = "ZUVF06lS3m"
+
+  companion object {
+    private const val NAVER_SEARCH_API_URL = "https://openapi.naver.com/v1/"
+  }
+
+  /** 검색 요청 메소드
+    * startIndex: 검색 시작 위치이며 기본값은 1입니다. 첫 검색은 기본값으로 제공하고, 
+    * 다음 검색을 요청하고 싶은 경우 다음 검색의 시작위치를 넣으면 됩니다.
+    * searchQuery: 검색을 원하는 문자열입니다.
+    * onSuccess: 검색에 성공했을 때 콜백입니다. 결과가 리스트형태로 제공되고 다음 검색의 시작 위치가 제공됩니다.
+    * onFailure: 요청에는 성공했지만, 에러 코드가 발생한 경우입니다. 에러 코드를 콜백합니다.
+    * onError: 요청 자체를 실패한 경우입니다. 요청한 서버에 장애가 발생했거나, 개발자의 잘못된 코드가 원인일 수도 있습니다.
+    */
+  abstract fun searchInfo(startIndex: Int,
+                          searchQuery: String,
+                          onSuccess: (resultList: List<T>, nextIndex: Int) -> Unit,
+                          onFailure: (errorCode: Int) -> Unit,
+                          onError: (throwable: Throwable) -> Unit)
+
+
+  /** 다음 검색의 시작 위치를 구하는 메소드
+    * 요청의 결과로 받은 start, display, total 값을 인자로 넣으면 다음 검색의 시작 위치를 반환합니다.
+    */
+  fun getNextIndex(start: Int, display: Int, total: Int): Int = if(start + display <= total) {
+    start+display
+  } else -1
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Retrofit - 네이버 영화 검색 API 호출
 <b>추가 고려 사항</b>  
 * 네이버 검색 API를 한번 호출 했을 때 출력 결과 건수는 10건(Default)이므로 다음 페이지 출력을 위해 '검색의 시작 위치+검색 결과 출력 건수(start+display)=다음 검색의 시작위치'를 결과 리스트와 함께 콜백합니다. 다음 검색의 시작 위치를 알고 있으므로 리사이클러뷰가 끝까지 스크롤되었을 때 다음 검색의 시작위치부터 10건의 검색 결과를 호출할 수 있습니다.
