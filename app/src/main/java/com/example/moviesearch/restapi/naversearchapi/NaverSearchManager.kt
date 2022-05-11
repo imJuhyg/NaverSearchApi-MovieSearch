@@ -3,8 +3,7 @@ package com.example.moviesearch.restapi.naversearchapi
 import com.example.moviesearch.restapi.RetrofitManager
 
 abstract class NaverSearchManager<T: Any> : RetrofitManager(NAVER_SEARCH_API_URL) {
-    // T: 결과로 받을 DTO 객체 타입을 명시. ex) MovieDTO, ...
-    // SearchType ex) movie.json, book.json, news.json ...
+    // T: 결과로 받을 DTO 객체 타입을 명시. ex) MovieDTO, BookDTO, newsDTO...
 
     protected val CLIENT_ID = "U3EGn6EooBj0_Kkc5iJU"
     protected val CLIENT_SECRET = "ZUVF06lS3m"
