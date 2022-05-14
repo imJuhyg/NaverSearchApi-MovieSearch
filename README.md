@@ -3,8 +3,8 @@
 [프로젝트 개요](#프로젝트-개요)  
 [기능](#기능)  
 [미리보기](#미리보기)  
-[아키텍쳐](#아키텍쳐)  
 [주요 기술 스택](#주요-기술-스택)  
+[아키텍쳐](#아키텍쳐)  
 [주요 구현 기능](#주요-구현-기능)  
 [API Version Test](#api-version-test)
 
@@ -21,6 +21,11 @@
 4. 검색 이력이 포함된 TextView를 누르면 해당 검색명을 통해 다시 검색합니다.
 ---
 
+## 미리보기
+<img width="40%" src="./readme_resource/preview.gif">
+
+---
+
 ## 주요 기술 스택
 ### Retrofit2 - 네이버 영화 검색 API 호출
 ### Glide - 영화 썸네일 이미지 로딩
@@ -28,14 +33,10 @@
 ### Coroutines - 네트워킹을 위한 비동기 처리
 
 ---
+
 ## 아키텍쳐
 ### MVVM  
 <img src="./readme_resource/architecture.png"/>
-
----
-
-## 미리보기
-<img width="40%" src="./readme_resource/preview.gif">
   
 ---
 ## 주요 구현 기능
