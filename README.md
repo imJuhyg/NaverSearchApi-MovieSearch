@@ -25,35 +25,44 @@
 3. 검색 이력이 저장됩니다. 최근에 검색한 이력을 10개까지만 표시합니다.
 4. 검색 이력이 포함된 TextView를 누르면 해당 검색명을 통해 다시 검색합니다.
 ---
+
 ## 미리보기
 <img width="40%" src="./readme_resource/preview.gif">
 
 ---
-## 아키텍쳐
-### MVVM  
-<img src="./readme_resource/architecture.png"/>
-
----
 
 ## 주요 기술 스택
+<<<<<<< HEAD
 ### Language
 * Kotlin
 ### Android
 * ### Retrofit2 - 네이버 영화 검색 API 호출
 * ### Glide - 영화 썸네일 이미지 로딩
 * ### Room Database - 최근 검색 이력 저장을 위한 로컬 데이터베이스
+=======
+### Retrofit2 - 네이버 영화 검색 API 호출
+### Glide - 영화 썸네일 이미지 로딩
+### Room Database - 최근 검색 이력 저장을 위한 로컬 데이터베이스
+### Coroutines - 네트워킹을 위한 비동기 처리
+
+---
+
+## 아키텍쳐
+### MVVM  
+<img src="./readme_resource/architecture.png"/>
+>>>>>>> 66d8b315872df589907051618d227d112e4fbd7d
   
 ---
 ## 주요 구현 기능
 ### 1. 재사용성을 고려한 클래스 확장
-* Open API를 사용하기 위한 레트로핏 객체를 추상 클래스로 정의하여 여러 클래스에서 상속 받을 수 있도록 정의했습니다.
-* NaverSearchManager는 네이버 검색 API의 모든 검색 타입을 사용할 수 있도록 확장성을 높인 추상 클래스입니다.
-* Naver 검색 API만을 위한 추상 클래스이며, 다음의 기능을 수행할 수 있습니다.  
+* RetrofitManager는 레트로핏 객체를 제공하는 추상 클래스입니다. Open API를 사용하는 여러 클래스에서 상속받을 수 있습니다.
+* NaverSearchManager는 네이버 검색 API의 모든 검색 타입을 사용할 수 있도록 확장성을 높인 추상 클래스입니다.  
+  Naver 검색 API만을 위한 추상 클래스이며, 다음의 기능을 수행할 수 있습니다.  
 ```
 1. CLIENT_ID 및 CLIENT_SECRET 값을 정의할 수 있습니다.
-2. 제네릭으로 구현된 추상 클래스입니다. 제네릭 타입 T를 통해 여러가지 DTO타입을 외부에서 지정할 수 있습니다.
+2. 제네릭으로 구현된 추상 클래스입니다. 제네릭 타입 T를 통해 여러 가지 DTO타입을 외부에서 지정할 수 있습니다.
    ex) MovieDTO, NewsDTO, BookDTO, ...
-3. 검색을 요청하는 메소드는 추상 메소드로 구현되어 외부에서 오버라이딩할 수 있습니다.
+3. 검색을 요청하는 메소드는 추상 메소드로 구현되어 상속받아 오버라이딩할 수 있습니다.
 4. 다음 검색의 시작 위치를 반환하는 일반 메소드를 사용할 수 있습니다.
 ```
   
@@ -72,7 +81,7 @@ abstract class RetrofitManager(private val baseUrl: String) {
 #### NaverSearchManager
 ```kotlin
 abstract class NaverSearchManager<T: Any> : RetrofitManager(NAVER_SEARCH_API_URL) {
-  // T: 결과로 받을 DTO 객체 타입을 명시. ex) MovieDTO, ...
+  // T: 결과로 받을 DTO 객체 타입을 명시. ex) MovieDTO, BookDTO, newsDTO...
 
   protected val CLIENT_ID = "U3EGn6EooBj0_Kkc5iJU"
   protected val CLIENT_SECRET = "ZUVF06lS3m"
@@ -104,7 +113,9 @@ abstract class NaverSearchManager<T: Any> : RetrofitManager(NAVER_SEARCH_API_URL
   } else -1
 }
 ```
-  
+
+&nbsp;
+
 ### 2. 영화 검색 API 구현
 * 호출할 URL를 구성하고 Call.enqueue()를 통한 비동기 호출을 수행합니다.
 * 호출 결과에 따라 onSuccess, onFailure, onError 중 하나를 콜백합니다.
