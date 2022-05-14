@@ -1,4 +1,4 @@
-# NaverSearchApi-MovieSearch-Sample
+# NaverSearchApi-MovieSearch
 
 ### 개인 프로젝트
 ### 개발 기간: 2022. 04. 22 ~ 2022. 05. 12
